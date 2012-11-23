@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# assume rebased
+_git_merge(){
+  local lr=$1
+  local topic=$2
+  local ahead=`echo $(git rev-list $lr..$topic | wc -l)`
+
+  # is ffable?
+  if [ "$ahead" = "1" ]; then
+    merge_opts="--ff"
+  else
+    merge_opts="--no-ff"
+  fi
+
+  echo "remerge> git merge $MERGE_OPTS $topic"
+  git merge $MERGE_OPTS $topic
+}
+
+git_remerge(){
+  local topic=$1
+  local current=$(git symbolic-ref HEAD 2> /dev/null)
+  local merge_opts
+  local behind=`echo $(git rev-list $..$full_ref | wc -l)`
+
+  if [ $behind != "0" ]; then
+    echo "remerge> git rebase $current $topic"
+    if [ git rebase $current $topic ]; then
+      _git_merge $current $topic
+    fi
+  else
+    # already rebased
+    _git_merge $current $topic
+  fi
+}
+
+git_remerge $@
+
