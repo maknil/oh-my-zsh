@@ -53,6 +53,24 @@ done
 # Load all of your custom configurations from custom/
 for config_file ($ZSH_CUSTOM/*.zsh(N)) source $config_file
 
+# bash supports
+if [ "$ENABLE_BASH_SUPPORT" = "true" ]
+then
+  # Load all bash completion.
+  autoload -U bashcompinit
+  bashcompinit -i
+
+  for plugin ($plugins); do
+    if [ -f $ZSH_CUSTOM/plugins/$plugin/_$plugin.bash ]; then
+      source $ZSH_CUSTOM/plugins/$plugin/_$plugin.bash
+    elif [ -f $ZSH/plugins/$plugin/_$plugin.bash ]; then
+      source $ZSH/plugins/$plugin/_$plugin.bash
+    fi
+  done
+
+  for config_file ($ZSH_CUSTOM/_*.bash(N)) source $config_file
+fi
+
 # Load the theme
 if [ "$ZSH_THEME" = "random" ]
 then
